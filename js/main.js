@@ -1,6 +1,8 @@
 let country = document.querySelector("#country");
 let city = document.querySelector("#city");
 let check = document.querySelector("#check");
+let cityValue = "Barcelona"; // Default city
+let countryValue = "Spain"; // Default country
 
 let tempIcon = document.querySelector("#tempIcon");
 let weatherCountry = document.querySelector("#weatherCountry");
@@ -12,21 +14,13 @@ let humidity = document.querySelector("#humidity");
 let longitude = document.querySelector("#longitude");
 let latitude = document.querySelector("#latitude");
 
+// Links data to page after it has been gotten
 function resolveData(data) {
-  console.log(data);
   weatherCountry.innerText = `${data.name} / ${data.sys.country}`;
   temperature.innerHTML = `${data.main.temp}°<b>C</b>`;
 
   data.weather.forEach((items) => {
     weatherDescription.innerText = items.description;
-
-    //Use Open weather Map URL For Icons If You Want To Use
-    //How To Use
-
-    //             let iconsForTemp = `http://openweathermap.org/img/wn/${items.icon}.png`;
-    //            tempIcon.src = iconsForTemp;
-    //
-    //i Will Use My Own Icons
     if (items.id < 250) {
       tempIcon.src = `assets/storm.svg`;
     } else if (items.id < 350) {
@@ -49,11 +43,9 @@ function resolveData(data) {
   humidity.innerText = `Humidity ${data.main.humidity}`;
   latitude.innerText = `Latitude ${data.coord.lat}`;
   longitude.innerText = `Latitude ${data.coord.lon}`;
-
-  country.value = "";
-  city.value = "";
 }
 
+// Fetches data
 async function fetchFunc(link) {
   try {
     let response = await fetch(link);
@@ -63,13 +55,24 @@ async function fetchFunc(link) {
     } else {
       resolveData(data);
     }
-  } catch (error) {
-    console.log(`ERROR: ${error}`);
-  }
+  } catch (error) {}
 }
 
+// Listens for new data
 check.addEventListener("click", () => {
-  let key = `bd4ea33ecf905116d12af172e008dbae`;
-  let url = `http://api.openweathermap.org/data/2.5/weather?q=${city.value},${country.value}&lang=en&units=metric&appid=${key}`;
-  fetchFunc(url);
+  cityValue = city.value;
+  countryValue = country.value;
+  call(cityValue, countryValue);
 });
+
+// Main function
+function call(cityValue, countryValue) {
+  let key = `bd4ea33ecf905116d12af172e008dbae`;
+  let url = `http://api.openweathermap.org/data/2.5/weather?q=${cityValue},${countryValue}&lang=en&units=metric&appid=${key}`;
+  fetchFunc(url);
+}
+
+// Repeat the function every 5 minutes
+setInterval(() => {
+  call(cityValue, countryValue);
+}, 1200000);
